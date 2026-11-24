@@ -1,0 +1,5 @@
+# schema.sql comes out of pg_dump: keep it out of the language bar and collapsed in diffs.
+db/schema.sql  linguist-generated=true
+
+# Shell scripts run on Linux; CRLF breaks the shebang.
+*.sh  text eol=lf

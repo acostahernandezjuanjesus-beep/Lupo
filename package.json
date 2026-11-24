@@ -1,0 +1,28 @@
+{
+  "name": "lupo",
+  "version": "1.0.0",
+  "description": "Warehouse and tool-crib inventory control (API; the client lives in client/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acostahernandezjuanjesus-beep/Lupo.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test",
+    "lint": "node client/node_modules/eslint/bin/eslint.js -c scripts/eslint.server.cjs *.js scripts test"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "fast-xml-parser": "^5.11.2",
+    "pg": "^8.23.1",
+    "web-push": "^3.6.7"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  }
+}

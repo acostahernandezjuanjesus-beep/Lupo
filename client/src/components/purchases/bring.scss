@@ -1,0 +1,63 @@
+// Styles for the "Bring to catalog" module. Same `system` layer as the rest (see index.scss).
+@layer system {
+
+
+.bring-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 2rem; }
+.bring-filter { display: flex; flex-direction: column; gap: .5rem; flex: 1 1 18rem; max-width: 30rem; min-width: 0; }
+// Carbon splits the width evenly and cuts labels: with four options "With suggestion" didn't fit at 375px.
+// Each button takes what its text needs (same as .purchases-group-by). Three classes: with two, Carbon's rules win.
+.bring .bring-filter .cds--content-switcher-btn { inline-size: auto; flex: 1 1 auto; padding-inline: .5rem; }
+
+.bring-list { list-style: none; margin: 0; padding: 0; }
+.bring-group {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem 1.5rem; align-items: start;
+    padding: 1.25rem 0; border-top: 1px solid var(--cds-border-subtle-01);
+}
+.bring-group__body { min-width: 0; }
+.bring-group__head { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin-bottom: .75rem; }
+.bring-group__description { font-size: 1rem; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.bring-group__actions { display: flex; flex-direction: column; gap: .5rem; }
+
+.bring-data { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .75rem 1.5rem; margin: 0; }
+.bring-data dt { font-size: .75rem; color: var(--cds-text-secondary); margin-bottom: .125rem; }
+.bring-data dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.bring-data__wide { grid-column: 1 / -1; }
+
+// A neutral rule, not a color: being linked is neither good nor bad.
+.bring-link { margin-top: .75rem; padding-inline-start: .75rem; border-inline-start: 3px solid var(--cds-border-strong-01); }
+// A suggestion looks like a proposal, not a fact: interaction border instead of the grey of an existing link.
+.bring-suggestion { margin-top: .75rem; padding-inline-start: .75rem; border-inline-start: 3px solid var(--cds-border-interactive);
+    display: flex; flex-direction: column; gap: .25rem; }
+
+.bring .cds--pagination { flex-wrap: wrap; }
+
+// Modal
+.bring-path > div { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .5rem; }
+.bring-path .cds--tile-content { display: flex; flex-direction: column; gap: .25rem; padding-inline-end: 1.5rem; }
+
+.bring-candidates { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--cds-border-subtle-01); }
+// Rows of 48px or more: picked with a finger, sometimes with gloves.
+.bring-candidate {
+    display: flex; flex-direction: column; gap: .125rem; width: 100%; min-height: 3rem;
+    padding: .75rem 1rem; text-align: start; font: inherit; color: var(--cds-text-primary); cursor: pointer;
+    background: none; border: 0; border-bottom: 1px solid var(--cds-border-subtle-01);
+    border-inline-start: 3px solid transparent;
+}
+.bring-candidate:hover { background: var(--cds-layer-hover-01); }
+.bring-candidate[aria-pressed='true'] { background: var(--cds-layer-selected-01); border-inline-start-color: var(--cds-border-interactive); }
+.bring-candidate:focus-visible { outline: 2px solid var(--cds-focus); outline-offset: -2px; }
+.bring-candidate:disabled { cursor: not-allowed; color: var(--cds-text-disabled); }
+.bring-candidate > span { overflow-wrap: anywhere; }
+
+.bring-chosen { padding: .75rem 1rem; background: var(--cds-layer-accent-01); }
+
+@media (max-width: 600px) {
+    .bring-filter { flex-basis: 100%; max-width: none; }
+    .bring-group { grid-template-columns: minmax(0, 1fr); }
+    .bring-group__actions .cds--btn { width: 100%; max-width: none; }
+}
+
+// The notice takes focus when done; show where it landed.
+.bring-notice:focus { outline: 2px solid var(--cds-focus); outline-offset: 2px; }
+
+} // @layer system

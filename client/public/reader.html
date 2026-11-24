@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reader diagnostics</title>
+<!-- Diagnostic page for barcode readers, not part of the app. Shows what a reader sends (exact text),
+     how it ends (Enter, Tab or nothing) and how fast it types. The 30 ms-per-key threshold is the same one
+     listenUsbReader uses in src/scanner.ts; change both together. -->
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#161616; color:#f4f4f4;
+         font:16px/1.5 'IBM Plex Sans',system-ui,sans-serif; padding:2rem; }
+  h1 { font-size:1.75rem; font-weight:300; margin:0 0 .25rem; }
+  p.sub { color:#a8a8a8; margin:0 0 2rem; }
+  #field { width:100%; max-width:560px; font:20px 'IBM Plex Mono',monospace;
+           background:#262626; color:#f4f4f4; border:0; border-bottom:2px solid #e71f28;
+           padding:.9rem; outline:none; }
+  table { border-collapse:collapse; margin-top:1.5rem; width:100%; max-width:900px; }
+  th,td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid #393939; vertical-align:top; }
+  th { color:#a8a8a8; font-weight:400; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; }
+  td.mono { font-family:'IBM Plex Mono',monospace; overflow-wrap:anywhere; }
+  .ok { color:#42be65; } .no { color:#ff8389; }
+  .hint { color:#a8a8a8; font-size:.875rem; max-width:620px; margin-top:2rem; }
+  button { background:#e71f28; color:#fff; border:0; padding:.7rem 1.2rem;
+           font:inherit; cursor:pointer; margin-top:1rem; }
+</style>
+</head>
+<body>
+<h1>Reader diagnostics</h1>
+<p class="sub">Click the field and fire the reader at any code. Repeat two or three times.</p>
+
+<input id="field" autofocus autocomplete="off" placeholder="focus stays here: fire the reader">
+
+<table id="results">
+  <thead><tr><th>#</th><th>Read</th><th>Length</th><th>Ends with</th><th>Duration</th><th>Per key</th></tr></thead>
+  <tbody></tbody>
+</table>
+
+<button onclick="copyResults()">Copy results</button>
+<textarea id="output" style="position:absolute;left:-9999px"></textarea>
+
+<p class="hint">
+  <strong>What is measured.</strong> A reader types the whole code at a few
+  milliseconds per character; a person takes a hundred or more. When the difference
+  is clear, the Scan screen can fire on its own when it recognises a scan and stay
+  out of the way when someone types by hand.
+</p>
+<p class="hint">
+  <strong>If "Ends with" says (nothing)</strong>, the Scan screen won't
+  recognise the scan: configure the reader to send Enter using the code sheet in
+  its manual. <strong>If what was read doesn't match the label</strong>
+  (a dash that comes out as an apostrophe, say), the reader is set to a different
+  keyboard layout than Windows.
+</p>
+
+<script>
+const field = document.getElementById('field');
+const tbody = document.querySelector('#results tbody');
+const rows = [];
+let times = [], first = 0;
+
+field.addEventListener('keydown', e => {
+  const t = performance.now();
+  if (!first) { first = t; times = []; }
+  if (e.key === 'Enter' || e.key === 'Tab') {
+    e.preventDefault();
+    record(field.value, e.key, t - first, times.length);
+    field.value = ''; first = 0; times = [];
+    return;
+  }
+  if (e.key.length === 1) times.push(t);
+});
+
+// If the reader sends no terminator, close on silence.
+let idle;
+field.addEventListener('input', () => {
+  clearTimeout(idle);
+  idle = setTimeout(() => {
+    if (field.value && first) {
+      record(field.value, '(nothing)', performance.now() - first, times.length);
+      field.value = ''; first = 0; times = [];
+    }
+  }, 700);
+});
+
+function record(text, end, ms, keys) {
+  const perKey = keys > 1 ? (ms / (keys - 1)) : 0;
+  const fast = perKey > 0 && perKey < 30;
+  rows.push({ text, end, ms: Math.round(ms), perKey: perKey.toFixed(1), fast });
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + rows.length + '</td>' +
+    '<td class="mono">' + text.replace(/</g,'&lt;') + '</td>' +
+    '<td>' + text.length + '</td>' +
+    '<td class="' + (end === '(nothing)' ? 'no' : 'ok') + '">' + end + '</td>' +
+    '<td>' + Math.round(ms) + ' ms</td>' +
+    '<td class="' + (fast ? 'ok' : 'no') + '">' + perKey.toFixed(1) + ' ms' +
+      (fast ? ' · reader' : ' · looks typed') + '</td>';
+  tbody.appendChild(tr);
+}
+
+function copyResults() {
+  const s = document.getElementById('output');
+  s.value = JSON.stringify(rows, null, 1);
+  s.select(); document.execCommand('copy');
+}
+</script>
+</body>
+</html>

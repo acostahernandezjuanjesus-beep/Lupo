@@ -1,0 +1,17 @@
+{
+  "name": "Lupo",
+  "short_name": "Lupo",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#161616",
+  "theme_color": "#161616",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

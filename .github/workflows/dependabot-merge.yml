@@ -1,0 +1,39 @@
+# Auto-merge Dependabot's weekly minor/patch groups once CI passes.
+# Only the two groups from dependabot.yml (`server`, `client`). Major bumps arrive as separate PRs and wait for a human.
+# Runs on workflow_run with the code from `main`, so nothing from the PR itself is ever executed.
+name: Merge Dependabot patches
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merge if it is a minor group
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          case "$BRANCH" in
+            dependabot/npm_and_yarn/server-*|dependabot/npm_and_yarn/client/client-*) ;;
+            *) echo "Not one of the minor groups ($BRANCH): a human reviews it."; exit 0;;
+          esac
+          # The open PR on that branch whose head commit is THE one that passed CI.
+          N=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open --json number,headRefOid \
+                --jq ".[] | select(.headRefOid == \"$SHA\") | .number")
+          [ -n "$N" ] || { echo "No open PR with that commit."; exit 0; }
+          gh pr merge "$N" --repo "$GITHUB_REPOSITORY" --squash --match-head-commit "$SHA"
+          echo "PR #$N merged."

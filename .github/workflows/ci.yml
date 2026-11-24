@@ -1,0 +1,73 @@
+# Runs on every pull request and every push to main.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Mondays too, so a new vulnerability in a dependency shows up even if nobody pushed.
+  schedule:
+    - cron: '0 13 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests, lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Real PostgreSQL 18: the tests create and drop their own `lupo_test_*` databases.
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      LUPO_TEST_ADMIN_URL: postgres://postgres:test@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+      - run: npm ci
+      # Root tests import TypeScript modules from client/ (scripts/loadTS.cjs).
+      - run: npm ci
+        working-directory: client
+      - name: Server lint
+        run: npm run lint
+      - name: Tests
+        run: npm test
+      - name: Client (types, lint and build)
+        working-directory: client
+        run: |
+          # -p matters: the root tsconfig.json only has references, so a bare `tsc --noEmit` checks nothing.
+          npx tsc -p tsconfig.app.json --noEmit
+          npx eslint src
+          npm run build
+
+  audit:
+    name: Vulnerable dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Production dependencies only.
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm audit --omit=dev --audit-level=high
+        working-directory: client

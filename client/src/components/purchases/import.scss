@@ -1,0 +1,56 @@
+// Styles for the book import screen, in the `system` layer (see index.scss). No state relies on color alone: each one is a text tag.
+
+@layer system {
+
+.import-choose { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem; }
+.import-choose input[type='file'] { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; overflow: hidden; }
+
+.import-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
+.import-figure { display: flex; flex-direction: column; gap: .25rem; padding: 1rem; background: var(--cds-layer-01); }
+.import-figure__value { font-size: 1.75rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.import-figure__text { font-size: .875rem; color: var(--cds-text-secondary); }
+
+.import-notices { margin: 0; padding-inline-start: 1.25rem; }
+.import-notices li { margin-bottom: .25rem; overflow-wrap: anywhere; }
+
+.import-supplier { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); gap: .5rem 1.5rem; align-items: end;
+    padding: .75rem 0; border-top: 1px solid var(--cds-border-subtle-01); }
+
+.import-bar { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem 1.5rem; }
+.import-bar .cds--content-switcher-btn { inline-size: auto; flex: 1 1 auto; padding-inline: .75rem; }
+
+// The grid: every cell has its border, like the Excel sheet. It scrolls sideways (.table-scroll) instead of squeezing columns.
+.import-grid { min-inline-size: 90rem; }
+.import-grid th, .import-grid td { border: 1px solid var(--cds-border-subtle-01); vertical-align: top; padding-block: .5rem; }
+.import-grid th { font-size: .75rem; white-space: nowrap; }
+.import-grid .import-row { inline-size: 3rem; text-align: right; color: var(--cds-text-secondary); font-variant-numeric: tabular-nums; }
+.import-grid .import-date { min-inline-size: 7rem; }
+.import-grid .import-nowrap { white-space: nowrap; }
+.import-grid .import-folio { white-space: nowrap; min-inline-size: 5.5rem; }
+// Minimum width per column: without it long-text columns squeeze and each row grows to 20 lines.
+.import-grid .import-supplier-col { min-inline-size: 9rem; }
+.import-grid .import-requested-by { min-inline-size: 8rem; }
+.import-grid .import-comment { min-inline-size: 10rem; }
+.import-grid .import-status-col { min-inline-size: 9rem; }
+.import-grid .import-category { min-inline-size: 16rem; }
+.import-grid .import-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+// Each folio starts with a thicker rule.
+.import-grid tr.import-new-block td { border-block-start: 2px solid var(--cds-border-strong-01); }
+.import-grid tr.import-done td { color: var(--cds-text-secondary); }
+.import-grid .import-desc { overflow-wrap: anywhere; min-inline-size: 16rem; }
+
+.import-status { display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; }
+.import-small { display: block; font-size: .75rem; color: var(--cds-text-secondary); overflow-wrap: anywhere; }
+
+// A suggestion is a PROPOSAL: interaction border, not the grey of an existing link.
+.import-suggestion { margin-block-start: .5rem; padding-inline-start: .75rem; border-inline-start: 3px solid var(--cds-border-interactive); }
+.import-link { padding-inline-start: .75rem; border-inline-start: 3px solid var(--cds-border-strong-01); }
+
+// The confirm bar stays visible while scrolling the grid.
+.import-confirm { position: sticky; inset-block-end: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: .75rem 1.5rem; padding: 1rem; background: var(--cds-layer-01);
+    border-block-start: 2px solid var(--cds-border-strong-01); }
+.import-confirm p { margin: 0; overflow-wrap: anywhere; }
+.import-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+
+}

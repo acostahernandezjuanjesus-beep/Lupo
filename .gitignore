@@ -1,0 +1,19 @@
+node_modules
+.env
+.env.*
+!.env.example
+.vs/
+.claude/
+.DS_Store
+Thumbs.db
+
+# Scratch queries
+scratch.sql
+db/scratch.sql
+
+# Never commit real spreadsheets or database dumps
+*.xlsx
+*.dump
+
+# Local database backups (see LUPO_BACKUPS)
+/backups/

@@ -1,0 +1,59 @@
+/* Tailwind supports Carbon, it doesn't replace it. Carbon owns components and tokens; Tailwind
+   does layout: grids, spacing, responsive, one-screen animations. To change a Carbon component,
+   change its `--cds-*` token rather than patching it with color or size utilities. */
+
+/* Layer order. `system` is Carbon plus our own styles (index.scss explains why they share it);
+   utilities sit on top so a `gap-4` or `md:grid-cols-2` wins without a specificity fight.
+   No `base`: Tailwind's preflight isn't imported because Carbon ships its own reset. */
+@layer theme, system, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme inline {
+    /* Drop Tailwind's whole palette; the colors are the ones defined below, named for what they mean. */
+    --color-*: initial;
+
+    /* Carbon tokens: they follow the theme (g10, g100). */
+    --color-background: var(--cds-background);
+    --color-layer: var(--cds-layer-01);
+    --color-text: var(--cds-text-primary);
+    --color-text-2: var(--cds-text-secondary);
+    --color-border: var(--cds-border-subtle-01);
+    --color-border-strong: var(--cds-border-strong-01);
+    --color-link: var(--cds-link-primary);
+    --color-focus: var(--cds-focus);
+    /* Carbon tooltips: inverse background and its text. */
+    --color-inverse: var(--cds-background-inverse);
+    --color-text-inverse: var(--cds-text-inverse);
+
+    /* The stock scale as is (theme.ts > stockLevel). Fixed on purpose: it belongs to the business,
+       not the theme. Amber only as an area; as text, use restock-text. */
+    --color-ample: #2e9e4f;
+    --color-restock: #fb8c00;
+    --color-restock-text: #8a5a00;
+    --color-below-min: #1a1a1a;
+    --color-uncounted: #c7ccd1;
+
+    /* Charts that aren't stock (index.scss, :root). */
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+
+    --color-brand: #e71f28;
+    --color-black: #1a1a1a;
+    --color-white: #fff;
+    --color-transparent: transparent;
+    --color-current: currentColor;
+
+    /* Carbon's breakpoints (md 672, lg 1056, xlg 1312, max 1584). Tailwind's own would give the grid
+       two sets of cuts that don't match, and Carbon components switch at theirs. */
+    --breakpoint-*: initial;
+    --breakpoint-md: 42rem;
+    --breakpoint-lg: 66rem;
+    --breakpoint-xlg: 82rem;
+    --breakpoint-max: 99rem;
+
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+}
